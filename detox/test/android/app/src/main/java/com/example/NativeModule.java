@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
+import com.example.utils.ReactNativeExtensionReflected;
 import com.example.utils.ViewSpies;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
@@ -24,11 +25,15 @@ public class NativeModule extends ReactContextBaseJavaModule {
 
     private static final String NAME = "NativeModule";
 
+    private final ReactNativeExtensionReflected reactNativeExtension;
+
     private ReactApplicationContext reactContext;
 
     NativeModule(ReactApplicationContext reactContext) {
         super(reactContext);
+
         this.reactContext = reactContext;
+        reactNativeExtension = new ReactNativeExtensionReflected();
     }
 
     @Override
@@ -111,6 +116,14 @@ public class NativeModule extends ReactContextBaseJavaModule {
         reactContext.getCurrentActivity().runOnUiThread(() -> {
             throw new RuntimeException("Simulated crash (native)");
         });
+    }
+
+    @ReactMethod
+    public void toggleNoneStorageSynchronization(Boolean enable) {
+        reactNativeExtension.toggleUISynchronization(enable);
+        reactNativeExtension.toggleJSBridgeSynchronization(enable);
+        reactNativeExtension.toggleTimersSynchronization(enable);
+        reactNativeExtension.toggleNetworkSynchronization(enable);
     }
 
     private WritableMap parseIntentExtras(String bundleKey) {
